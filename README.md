@@ -86,14 +86,7 @@ Windows 10 ou 11 (Recomendado para suporte completo ao Winget e WMI).
 Winget instalado (Padrão no Windows 10/11 atualizado) para a funcionalidade de "Atualizar Apps".
 
 Passo a Passo
-Clone o repositório:
-
-Bash
-
-git clone https://github.com/seu-usuario/evo-system.git
-Abra o arquivo de solução evosystem-backend.sln no Visual Studio.
-
-Restaure os pacotes NuGet (caso necessário).
+Clone o repositório
 
 Defina o projeto EvoSystem.UI como "Set as Startup Project" (Projeto de Inicialização).
 
