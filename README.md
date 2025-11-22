@@ -1,280 +1,127 @@
-# Biblioteca `evosystem-backend`
+# Evo-System - APP
 
-Esta documentação descreve a API da biblioteca `evosystem-backend` (compilada como `evosystem-backend.dll`). O objetivo é fornecer todas as informações necessárias para instanciar as classes e consumir os métodos que buscam dados do sistema, aplicativos, drivers e arquivos do usuário.
+Evo-System é um utilitário de sistema "tudo-em-um" desenvolvido em C# (WPF/.NET Framework). Ele oferece uma interface moderna e elegante para monitoramento de hardware, limpeza de disco, gerenciamento de inicialização e atualização de drivers/softwares.
 
-## Como Usar
-A `evosystem-backend` é uma biblioteca de classes (.dll) .NET Framework 4.7.2. Para usá-la no frontend, você precisará instanciar a classe "Manager" específica para a funcionalidade que deseja acessar (por exemplo, `SystemInfo`, `AppManager`, etc.) e, em seguida, chamar seus métodos públicos.
+O projeto foi desenhado com foco em UX moderna (Dark Mode, Glassmorphism) e arquitetura modular, separando a lógica de sistema da interface do usuário.
 
-A maioria dos métodos já trata exceções internamente (como `UnauthorizedAccessException` ao ler o registro ou WMI). Em caso de falha, eles geralmente retornam uma lista vazia (`List<>`) ou uma string indicando um erro (ex: "Erro: ...").
+📋 Funcionalidades Principais
+O aplicativo é dividido em módulos acessíveis através de um painel lateral intuitivo:
 
-## Referência da API
+1. 🏠 Painel Principal (Dashboard)
+Monitoramento em Tempo Real: Exibe informações vitais do hardware via WMI (CPU, GPU, RAM e Sistema Operacional).
 
-Abaixo estão detalhadas todas as classes e métodos públicos disponíveis para o frontend.
+Scan Inteligente: Um botão de verificação central que analisa o sistema em busca de otimizações, drivers desatualizados e arquivos temporários com feedback visual de progresso.
 
------
+2. 🧹 Limpeza de Sistema (Cleanup)
+Ferramenta robusta para liberar espaço em disco, removendo:
 
-### 1\. SystemInfo
+Arquivos Temporários (%TEMP% e AppData).
 
-Fornece informações estáticas sobre o hardware e o sistema operacional da máquina.
+Cache do Windows e Prefetch.
 
-**Classe:** `evosystem_backend.SystemInfo`
-**Construtor:** `public SystemInfo()`
+Cache de Miniaturas (Thumbnails).
 
------
+Arquivos de Otimização do Windows Update.
 
-#### `public string GetOperatingSystem()`
+Esvaziamento da Lixeira.
 
-Recupera o nome amigável (Caption) do sistema operacional.
+3. 🚀 Gerenciador de Inicialização (Startup)
+Permite visualizar e gerenciar programas que iniciam junto com o Windows.
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `string`
-  * **Exemplo de Resposta:** `"Microsoft Windows 11 Pro"`
-  * **Resposta em Caso de Erro:** `"Erro: <mensagem>"` ou `"Não encontrado"`
+Identifica se o programa é de usuário local (HKEY_CURRENT_USER) ou global (HKEY_LOCAL_MACHINE).
 
------
+Exibe o status (Habilitado/Desabilitado) e o caminho do executável.
 
-#### `public string GetCpuName()`
+4. 📦 Atualizador de Softwares (Winget UI)
+Integração nativa com o Windows Package Manager (Winget).
 
-Recupera o nome do processador (CPU).
+Lista aplicativos instalados que possuem atualizações pendentes.
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `string`
-  * **Exemplo de Resposta:** `"Intel(R) Core(TM) i9-13900K"`
-  * **Resposta em Caso de Erro:** `"Erro: <mensagem>"` ou `"Não encontrado"`
+Exibe versão atual vs. nova versão.
 
------
+Interface amigável para visualizar as atualizações disponíveis sem precisar usar o terminal.
 
-#### `public string GetMotherboardName()`
+5. 💾 Drivers e Arquivos Grandes
+Drivers: Lista drivers assinados instalados no sistema, exibindo fabricante e versão.
 
-Recupera o nome do modelo da placa-mãe.
+Scanner de Arquivos: Localiza arquivos maiores que 100MB nas pastas do usuário (Documentos, Vídeos, etc.) para ajudar na liberação de espaço.
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `string`
-  * **Exemplo de Resposta:** `"ROG STRIX Z790-E GAMING WIFI"`
-  * **Resposta em Caso de Erro:** `"Erro: <mensagem>"` ou `"Não encontrado"`
+6. ⚙️ Configurações e Internacionalização
+Multi-idioma: Suporte completo a Português (Brasil) e English (US) com troca dinâmica sem reiniciar o app.
 
------
+Personalização: Opções para iniciar com o Windows e minimizar para a bandeja (Tray).
 
-#### `public string GetGpuName()`
+🛠️ Tecnologias Utilizadas
+O projeto está estruturado em uma solução (.sln) contendo três projetos principais:
 
-Recupera o nome da placa de vídeo (GPU) principal.
+🖥️ Frontend (EvoSystem.UI)
+Framework: WPF (Windows Presentation Foundation) .NET 4.7.2.
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `string`
-  * **Notas:** O método tenta ativamente filtrar adaptadores de vídeo virtuais, meta ou remotos para focar na GPU física principal.
-  * **Exemplo de Resposta:** `"NVIDIA GeForce RTX 4090"`
-  * **Resposta em Caso de Erro:** `"Erro: <mensagem>"` ou `"Não encontrado"`
+Design: Estilização customizada com XAML, uso de ControlTemplate para botões modernos, gradientes e sombras (DropShadow).
 
------
+Padrões: Code-behind para lógica de UI e Eventos para troca de idioma em tempo real.
 
-#### `public string GetTotalRam()`
+🧠 Backend (evosystem-backend)
+Tipo: Class Library (.dll).
 
-Calcula a quantidade total de memória RAM física instalada.
+Core:
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `string`
-  * **Notas:** O valor é retornado como uma string já formatada em Gigabytes (GB), arredondada para duas casas decimais.
-  * **Exemplo de Resposta:** `"31.85 GB"`
-  * **Resposta em Caso de Erro:** `"Erro ao consultar RAM: <mensagem>"` ou `"Não encontrado"`
+System.Management: Para consultas WMI (Hardware e Drivers).
 
------
+Microsoft.Win32.Registry: Para ler chaves de desinstalação e inicialização.
 
-### 2\. AppManager
+System.IO: Para manipulação e varredura de arquivos recursiva.
 
-Gerencia a listagem de aplicativos instalados no sistema.
+System.Diagnostics.Process: Para comunicação com o CLI do Winget.
 
-**Classe:** `evosystem_backend.AppManager`
-**Construtor:** `public AppManager()`
+🧪 Tester (evosystem-tester)
+Aplicação Console para testar as funções do backend isoladamente antes da implementação na UI.
 
------
+🚀 Como Executar o Projeto
+Pré-requisitos
+Visual Studio 2022 (ou compatível com suporte a .NET Framework 4.7.2).
 
-#### `public List<InstalledApp> GetInstalledApps()`
+Windows 10 ou 11 (Recomendado para suporte completo ao Winget e WMI).
 
-Recupera uma lista de aplicativos instalados, lendo a chave `Uninstall` do registro do Windows.
+Winget instalado (Padrão no Windows 10/11 atualizado) para a funcionalidade de "Atualizar Apps".
 
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `List<InstalledApp>`
-  * **Notas:** Atualmente, lê apenas de `HKEY_LOCAL_MACHINE`. Pode requerer privilégios de administrador para listar todos os apps. Se ocorrer um erro de permissão ou outro, uma lista vazia será retornada.
+Passo a Passo
+Clone o repositório:
 
-#### Estrutura de Resposta: `InstalledApp`
+Bash
 
-Esta é a classe que será retornada na lista.
+git clone https://github.com/seu-usuario/evo-system.git
+Abra o arquivo de solução evosystem-backend.sln no Visual Studio.
 
-```csharp
-public class InstalledApp
-{
-    // Nome de exibição do aplicativo (ex: "Google Chrome")
-    public string DisplayName { get; set; }
+Restaure os pacotes NuGet (caso necessário).
 
-    // Data da instalação (ex: "20231027")
-    // O método preenche com "N/A" se a data não for encontrada no registro.
-    public string InstallDate { get; set; }
-}
-```
+Defina o projeto EvoSystem.UI como "Set as Startup Project" (Projeto de Inicialização).
 
------
+Compile e execute (F5).
 
-### 3\. DriverManager
-
-Gerencia a listagem de drivers de dispositivo instalados.
-
-**Classe:** `evosystem_backend.DriverManager`
-**Construtor:** `public DriverManager()`
-
------
-
-#### `public List<DriverInfo> GetDrivers()`
-
-Recupera uma lista de drivers assinados (consulta WMI `Win32_PnPSignedDriver`).
-
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `List<DriverInfo>`
-  * **Notas:** Em caso de falha na consulta WMI, retorna uma lista vazia.
-
-#### Estrutura de Resposta: `DriverInfo`
-
-Esta é a classe que será retornada na lista.
-
-```csharp
-public class DriverInfo
-{
-    // Nome amigável do dispositivo (ex: "Realtek High Definition Audio")
-    public string DeviceName { get; set; }
-
-    // Versão do driver instalada (ex: "10.0.19041.1")
-    // O método preenche com "N/A" se for nulo.
-    public string DriverVersion { get; set; }
-
-    // Fabricante do driver (ex: "Realtek")
-    // O método preenche com "N/A" se for nulo.
-    public string Manufacturer { get; set; }
-}
-```
-
------
-
-### 4\. StartupManager
-
-Gerencia a listagem de aplicativos configurados para iniciar com o Windows.
-
-**Classe:** `evosystem_backend.StartupManager`
-**Construtor:** `public StartupManager()`
-
------
-
-#### `public List<StartupApp> GetStartupApps()`
-
-Recupera uma lista de aplicativos das chaves "Run" do registro, tanto do usuário atual (`HKEY_CURRENT_USER`) quanto da máquina local (`HKEY_LOCAL_MACHINE`).
-
-  * **Argumentos:** Nenhum.
-  * **Retorno:** `List<StartupApp>`
-  * **Notas:** Em caso de erro (ex: permissão), a lista pode estar incompleta (por exemplo, contendo apenas os apps do usuário atual).
-
-#### Estrutura de Resposta: `StartupApp`
-
-Esta é a classe que será retornada na lista.
-
-```csharp
-public class StartupApp
-{
-    // Nome da entrada no registro (ex: "OneDrive")
-    public string Name { get; set; }
-
-    // Caminho completo para o executável (ex: "C:\Program Files\Microsoft OneDrive\OneDrive.exe")
-    public string FilePath { get; set; }
-
-    // Indica a origem da entrada.
-    // true = Veio de HKEY_CURRENT_USER (apenas para o usuário atual)
-    // false = Veio de HKEY_LOCAL_MACHINE (para todos os usuários)
-    public bool IsFromCurrentUser { get; set; }
-}
-```
-
------
-
-### 5\. FileManager
-
-Fornece métodos para pesquisar arquivos grandes no sistema.
-
-**Classe:** `evosystem_backend.FileManager`
-**Construtor:** `public FileManager()`
-
------
-
-#### `public List<FileInfo> FindLargeFilesQuickScan(long minSizeInBytes)`
-
-Executa uma varredura rápida por arquivos grandes nas pastas de perfil do usuário (Documentos, Vídeos, Músicas, Imagens e Desktop).
-
-  * **Argumentos:**
-      * `long minSizeInBytes`: O tamanho mínimo em bytes que um arquivo deve ter para ser incluído na lista. (Ex: `1048576` para 1 MB).
-  * **Retorno:** `List<FileInfo>`
-
------
-
-#### `public List<FileInfo> FindLargeFiles(string startDirectory, long minSizeInBytes)`
-
-Executa uma varredura completa e recursiva em um diretório específico fornecido.
-
-  * **Argumentos:**
-      * `string startDirectory`: O caminho da pasta onde a busca deve começar (ex: `"C:\"` ou `"D:\Meus Documentos"`).
-      * `long minSizeInBytes`: O tamanho mínimo em bytes que um arquivo deve ter.
-  * **Retorno:** `List<FileInfo>`
-  * **Notas:** Este método pode demorar dependendo do diretório. Erros de acesso a pastas (como `UnauthorizedAccessException`) são capturados e ignorados, continuando a varredura em outras pastas.
-
-#### Estrutura de Resposta: `System.IO.FileInfo`
-
-Ambos os métodos retornam uma lista de `FileInfo`, que é uma classe interna do .NET. As propriedades mais relevantes para a UI são:
-
-```csharp
-// (Classe do System.IO)
-public class FileInfo
-{
-    // Nome do arquivo com extensão (ex: "meu_video.mp4")
-    public string Name { get; }
-
-    // Caminho completo do arquivo (ex: "C:\Users\Joao\Videos\meu_video.mp4")
-    public string FullName { get; }
-
-    // Tamanho do arquivo em bytes (ex: 53924820)
-    public long Length { get; }
-
-    // Data da última modificação
-    public DateTime LastWriteTime { get; }
-
-    // (Existem outras propriedades, mas estas são as principais)
-}
-```
-
------
-
-### 6\. WingetManager
-
-Verifica aplicativos que podem ser atualizados usando o Gerenciador de Pacotes do Windows (Winget).
-
-**Classe:** `evosystem_backend.WingetManager`
-**Construtor:** `public WingetManager()`
-
------
-
-#### `public List<string> ListUpgradableApps()`
-
-Executa o comando `winget list --upgrade-available` e retorna a saída.
-
-  * **Argumentos:** Nenhum.
-
-  * **Retorno:** `List<string>`
-
-  * **Notas Importantes:**
-
-    1.  **Dependência Externa:** Este método **exige** que o cliente `winget.exe` (Gerenciador de Pacotes do Windows) esteja instalado na máquina do usuário e acessível no `PATH` do sistema. Se o `winget` não for encontrado ou falhar, o método retornará uma lista vazia.
-    2.  **Formato do Retorno:** O retorno **NÃO** é um objeto formatado. É uma lista de `string`, onde cada string é uma linha da saída bruta do console do `winget`. O código apenas remove as linhas de cabeçalho ("Nome", "----").
-    3.  **Parsing no Frontend:** O frontend será responsável por fazer o *parsing* (divisão) de cada string para extrair as colunas desejadas.
-
-  * **Exemplo de item na lista de retorno:**
-
-    ```
-    "Microsoft.PowerToys 0.64.0 0.64.1 winget"
-    ```
-
-    O frontend precisará dividir esta string (provavelmente por espaços múltiplos) para obter o Nome (`Microsoft.PowerToys`), Versão Atual (`0.64.0`), Versão Disponível (`0.64.1`), etc.
-
+⚠️ Nota Importante: Para que funcionalidades como "Limpeza de Disco" (acesso a pastas do sistema) e "Gerenciamento de Drivers" funcionem corretamente, o Visual Studio ou o aplicativo compilado devem ser executados como Administrador.
+
+📂 Estrutura de Pastas
+EvoSystem/
+├── evosystem-backend/       # Lógica de Negócio (DLL)
+│   ├── Actions/             # Lógica de Limpeza (CleanupManager)
+│   ├── Core/                # Helpers (WMI, Filesystem)
+│   └── Info/                # Classes de Coleta de Dados (SystemInfo, AppManager)
+│
+├── EvoSystem.UI/            # Interface Gráfica (WPF)
+│   ├── Helpers/             # Configurações (AppSettings) e Estado
+│   ├── Views/               # Telas (Home, Options, Cleanup, etc.)
+│   ├── Resources/           # Estilos e Temas (App.xaml)
+│   └── MainWindow.xaml      # Janela Principal
+│
+└── evosystem-tester/        # App Console para testes
+🎨 Galeria de Estilos
+O projeto utiliza uma paleta de cores escura e moderna definida em App.xaml:
+
+Fundo Base: #10121a (Quase preto/azul noturno)
+
+Cards: #25283d (Cinza azulado)
+
+Acentos: #3d52fc (Azul Neon) e #00ff88 (Verde status)
+
+Gradientes: Utilizados em botões e fundos para profundidade visual.
