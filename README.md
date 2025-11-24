@@ -278,3 +278,6 @@ Executa o comando `winget list --upgrade-available` e retorna a saída.
 
     O frontend precisará dividir esta string (provavelmente por espaços múltiplos) para obter o Nome (`Microsoft.PowerToys`), Versão Atual (`0.64.0`), Versão Disponível (`0.64.1`), etc.
 
+    * **Rodar app pelo terminal**
+    dotnet run --project EvoSystem.UI/EvoSystem.UI.csproj
+
