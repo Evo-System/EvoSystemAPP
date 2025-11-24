@@ -117,10 +117,9 @@ Cards: #25283d (Cinza azulado)
 
 Acentos: #3d52fc (Azul Neon) e #00ff88 (Verde status)
 
-<<<<<<< HEAD
-    * **Rodar app pelo terminal**
+
+* **Rodar app pelo terminal**
     dotnet run --project EvoSystem.UI/EvoSystem.UI.csproj
 
-=======
 Gradientes: Utilizados em botões e fundos para profundidade visual.
 >>>>>>> 6edbe730a4adb250e3a04468ae0fbfd8940894f4
